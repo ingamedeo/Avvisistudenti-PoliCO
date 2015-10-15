@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory
+        android:title="General"
+        android:key="pref_key_storage_settings">
+
+        <ListPreference
+            android:key="language_preference"
+            android:title="Language"
+            android:entries="@array/languages"
+            android:entryValues="@array/language_codes"
+            android:summary="%s"/>
+
+        <CheckBoxPreference
+            android:key="pref_sync"
+            android:title="Auto-Sync"
+            android:summary="Sync news automatically"
+            android:defaultValue="true" />
+
+        <CheckBoxPreference
+            android:key="pref_notifications"
+            android:title="Show notifications"
+            android:summary="Show notifications when unread news is available"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
+
+<!-- android:dependency="pref_sync" -->

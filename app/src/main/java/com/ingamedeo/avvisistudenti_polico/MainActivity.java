@@ -1,0 +1,199 @@
+package com.ingamedeo.avvisistudenti_polico;
+
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
+
+import com.ingamedeo.avvisistudenti_polico.db.ContentProviderDb;
+import com.ingamedeo.avvisistudenti_polico.db.NewsTable;
+
+public class MainActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int SETTINGS_RESULT = 0;
+    private static final int LOADER_ID = 1;
+
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+    private Context context;
+
+    private NewsAdapter newsAdapter;
+    private ListView newsContainer;
+    private Uri contentUri;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_main);
+
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
+        swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark, R.color.colorAccent);
+
+        newsContainer = (ListView) findViewById(R.id.newsContainer);
+        newsAdapter = new NewsAdapter(getApplicationContext(), null, 0);
+        newsContainer.setAdapter(newsAdapter);
+
+        contentUri = Uri.withAppendedPath(ContentProviderDb.CONTENT_URI, NewsTable.TABLE_NAME);
+
+        context = MainActivity.this;
+
+        alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(context, HtmlParseService.class);
+        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+
+        //alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
+        //        AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+        //        AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
+
+        //Init our loader
+        getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
+        //getLoaderManager().initLoader(LOADER_ID, null, this);
+
+        /* Why do you call restartLoader instead of initLoader?
+        *
+        * I've found out that restart does exactly the same thing as init if our loader doesn't exist yet
+        */
+
+        newsContainer.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent newsIntent = new Intent(MainActivity.this, NewsActivity.class);
+                Cursor c = (Cursor) parent.getItemAtPosition(position);
+                newsIntent.putExtra(getResources().getString(R.string.news_extra_title), Constants.unescapeString(c.getString(c.getColumnIndex(NewsTable.TITLE))));
+                newsIntent.putExtra(getResources().getString(R.string.news_extra_link), Constants.unescapeString(c.getString(c.getColumnIndex(NewsTable.LINK))));
+                startActivity(newsIntent);
+            }
+        });
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Intent serviceIntent = new Intent(MainActivity.this, HtmlParseService.class);
+                startService(serviceIntent);
+            }
+        });
+
+    }
+
+    private BroadcastReceiver serviceStatusReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i(Constants.TAG, "Receiver called!");
+            Constants.ServiceStatus serviceStatus = Constants.ServiceStatus.values()[intent.getIntExtra(Constants.EXTENDED_DATA_STATUS, 0)];
+
+            /* Stop refreshing */
+            if (swipeRefreshLayout!=null) {
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+            switch (serviceStatus) {
+                case DONE:
+                    //Do nothing
+                    break;
+                case ERROR:
+                    Snackbar.make(findViewById(android.R.id.content), getResources().getString(R.string.failed_update_news), Snackbar.LENGTH_LONG)
+                            .setAction(getResources().getString(R.string.retry), new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    swipeRefreshLayout.setRefreshing(true);
+                                    Intent serviceIntent = new Intent(MainActivity.this, HtmlParseService.class);
+                                    startService(serviceIntent);
+                                }
+                            })
+                            .setActionTextColor(getResources().getColor(R.color.colorAccent))
+                            .show();
+                    break;
+            }
+        }
+    };
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(serviceStatusReceiver, new IntentFilter(Constants.BROADCAST_ACTION));
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceStatusReceiver);
+        super.onPause();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            Intent settingsIntent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivityForResult(settingsIntent, SETTINGS_RESULT);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(
+                this,
+                contentUri,
+                NewsTable.COLUMNS,
+                null,
+                null,
+                NewsTable._ID + " ASC"); /* (Should adjust updated messages automatically) */
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor != null && cursor.getCount() > 0) {
+            newsAdapter.swapCursor(cursor);
+        } else {
+            newsAdapter.swapCursor(null);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        newsAdapter.swapCursor(null);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode==SETTINGS_RESULT) {
+            swipeRefreshLayout.setRefreshing(true); //Set refreshing
+            /* Call service to refresh */
+            Intent serviceIntent = new Intent(MainActivity.this, HtmlParseService.class);
+            startService(serviceIntent);
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+}
