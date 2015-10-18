@@ -4,8 +4,6 @@ android {
     compileSdkVersion 23
     buildToolsVersion "23.0.1"
 
-    dexOptions { jumboMode true }
-
     defaultConfig {
         applicationId "com.ingamedeo.avvisistudenti_polico"
         minSdkVersion 10
@@ -15,7 +13,7 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -29,3 +27,9 @@ dependencies {
 }
 
 //compile project(path: ':backend', configuration: 'android-endpoints')
+/*
+*    dexOptions {
+        jumboMode true
+        javaMaxHeapSize "4g"
+    }
+* */

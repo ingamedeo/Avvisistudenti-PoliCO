@@ -105,6 +105,7 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
             /* Set to false */
             getSharedPreferences().edit().putBoolean(getResources().getString(R.string.preference_isfirststart), false);
         }
+
     }
 
     private BroadcastReceiver serviceStatusReceiver = new BroadcastReceiver() {
