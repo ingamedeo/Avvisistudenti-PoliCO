@@ -1,14 +1,16 @@
 package com.ingamedeo.avvisistudenti_polico;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -31,19 +33,25 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
     private static final int SETTINGS_RESULT = 0;
     private static final int LOADER_ID = 1;
 
-    private AlarmManager alarmMgr;
-    private PendingIntent alarmIntent;
-    private Context context;
+    //private AlarmManager alarmMgr;
+    //private PendingIntent alarmIntent;
+    private Context context = MainActivity.this;
 
     private NewsAdapter newsAdapter;
     private ListView newsContainer;
     private Uri contentUri;
+
+    private SharedPreferences sharedPreferences;
+    private boolean isFirstStart = true;
+    private boolean isAutoSyncEnabled = true;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        loadfromPref();
 
         setContentView(R.layout.activity_main);
 
@@ -56,11 +64,9 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
 
         contentUri = Uri.withAppendedPath(ContentProviderDb.CONTENT_URI, NewsTable.TABLE_NAME);
 
-        context = MainActivity.this;
-
-        alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(context, HtmlParseService.class);
-        alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
+        //alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        //Intent intent = new Intent(context, HtmlParseService.class);
+        //alarmIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         //alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
         //        AlarmManager.INTERVAL_FIFTEEN_MINUTES,
@@ -89,11 +95,16 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Intent serviceIntent = new Intent(MainActivity.this, HtmlParseService.class);
-                startService(serviceIntent);
+                runHtmlParseService();
             }
         });
 
+        /* First Startup Handling */
+        if (isFirstStart) {
+            runHtmlParseService();
+            /* Set to false */
+            getSharedPreferences().edit().putBoolean(getResources().getString(R.string.preference_isfirststart), false);
+        }
     }
 
     private BroadcastReceiver serviceStatusReceiver = new BroadcastReceiver() {
@@ -117,8 +128,7 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
                                 @Override
                                 public void onClick(View v) {
                                     swipeRefreshLayout.setRefreshing(true);
-                                    Intent serviceIntent = new Intent(MainActivity.this, HtmlParseService.class);
-                                    startService(serviceIntent);
+                                    runHtmlParseService();
                                 }
                             })
                             .setActionTextColor(getResources().getColor(R.color.colorAccent))
@@ -159,6 +169,33 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
+    private void runHtmlParseService() {
+        Intent serviceIntent = new Intent(MainActivity.this, HtmlParseService.class);
+        startService(serviceIntent);
+    }
+
+    private SharedPreferences getSharedPreferences() {
+        if (sharedPreferences==null) {
+            sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        }
+        return sharedPreferences;
+    }
+
+    private void loadfromPref() {
+        isFirstStart = getSharedPreferences().getBoolean(getResources().getString(R.string.preference_isfirststart), true);
+        isAutoSyncEnabled = getSharedPreferences().getBoolean(getResources().getString(R.string.preference_sync), true);
+        toggleBootReceiver(isAutoSyncEnabled);
+    }
+
+    private void toggleBootReceiver(boolean enable) {
+        ComponentName receiver = new ComponentName(context, BootReceiver.class);
+        PackageManager pm = context.getPackageManager();
+
+        pm.setComponentEnabledSetting(receiver,
+                enable ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         return new CursorLoader(
@@ -189,9 +226,12 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
 
         if (requestCode==SETTINGS_RESULT) {
             swipeRefreshLayout.setRefreshing(true); //Set refreshing
+
+            /* Load new pref */
+            loadfromPref();
+
             /* Call service to refresh */
-            Intent serviceIntent = new Intent(MainActivity.this, HtmlParseService.class);
-            startService(serviceIntent);
+            runHtmlParseService();
         }
 
         super.onActivityResult(requestCode, resultCode, data);

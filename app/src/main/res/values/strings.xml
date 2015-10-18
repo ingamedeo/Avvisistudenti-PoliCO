@@ -3,6 +3,7 @@
     <string name="action_settings">Settings</string>
     <string name="preference_isfirststart">isFirstStart</string>
     <string name="preference_lang">language_preference</string>
+    <string name="preference_sync">pref_sync</string>
     <string name="it_lang_code">it</string>
     <string name="poli_como_url_prefix">http://www.polo-como.polimi.it/</string>
     <string name="poli_como_url_suff_it">/it/avvisi-studenti/</string>

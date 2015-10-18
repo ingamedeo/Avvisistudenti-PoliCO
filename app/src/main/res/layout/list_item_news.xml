@@ -21,6 +21,7 @@
         android:id="@+id/newsTitle"
         android:text="AVVISO IMPORTANTE - Chiusura Segreteria / StuDesk / Welcome Desk - martedì 13/10/2015"
         android:padding="5dp"
-        android:gravity="center" />
+        android:gravity="center"
+        android:textColor="@color/newsText"/>
 
 </LinearLayout>

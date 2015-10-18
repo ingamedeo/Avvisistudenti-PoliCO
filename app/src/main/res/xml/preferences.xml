@@ -13,7 +13,7 @@
             android:summary="%s"/>
 
         <CheckBoxPreference
-            android:key="pref_sync"
+            android:key="@string/preference_sync"
             android:title="Auto-Sync"
             android:summary="Sync news automatically"
             android:defaultValue="true" />
