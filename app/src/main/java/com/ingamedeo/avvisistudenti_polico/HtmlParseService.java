@@ -30,6 +30,7 @@ public class HtmlParseService extends IntentService {
     private SharedPreferences sharedPreferences;
     private Constants.Lang lang;
     private DbAdapter dbAdapter;
+    private String filterStr = null; //Don't change this line...I'm still working on it
 
     public HtmlParseService() {
         super(HtmlParseService.class.getSimpleName());
@@ -38,6 +39,7 @@ public class HtmlParseService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
+        /* Demo notification - helps ensure the service is launched */
         Constants.sampleNotification(HtmlParseService.this);
 
         dbAdapter = new DbAdapter(this); //New dpAdapter instance, used for everything except query()
@@ -125,6 +127,7 @@ public class HtmlParseService extends IntentService {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
 
+        filterStr = sharedPreferences.getString(getResources().getString(R.string.filter_preference), null);
         /* Android ListPreference seems to accept Strings only, i don't get why, but that's it. */
         String langIndexStr = sharedPreferences.getString(getResources().getString(R.string.preference_lang), String.valueOf(Constants.getDefaultLang(this).ordinal()));
         lang = Constants.Lang.values()[Integer.valueOf(langIndexStr)];
@@ -147,11 +150,17 @@ public class HtmlParseService extends IntentService {
 
             Elements date = item.select(".avvisi-studenti-list-date");
             Elements link = item.select("a");
+            String text = link.text();
 
             if (date.size()==1 && link.size()==1) {
-                if (!dbAdapter.checkNewsExists(date.text(), link.text(), "http://www.polo-como.polimi.it/"+link.attr("href"))) {
+
+                /* Check link.text() contains filter keywords ... + Db Check */
+                if (((filterStr!=null && filterStr.contains(text)) || filterStr==null) && !dbAdapter.checkNewsExists(date.text(), text, "http://www.polo-como.polimi.it/"+link.attr("href"))) {
                     newTitles.add(link.text());
                 }
+
+                //if (!dbAdapter.checkNewsExists(date.text(), text, "http://www.polo-como.polimi.it/"+link.attr("href"))) {
+                //}
             } else {
                 return null;
             }
