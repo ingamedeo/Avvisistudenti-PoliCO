@@ -2,7 +2,6 @@ package com.ingamedeo.avvisistudenti_polico;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

@@ -17,7 +17,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,13 +28,11 @@ import android.widget.ListView;
 import com.ingamedeo.avvisistudenti_polico.db.ContentProviderDb;
 import com.ingamedeo.avvisistudenti_polico.db.NewsTable;
 
-public class MainActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int SETTINGS_RESULT = 0;
     private static final int LOADER_ID = 1;
 
-    //private AlarmManager alarmMgr;
-    //private PendingIntent alarmIntent;
     private Context context = MainActivity.this;
 
     private NewsAdapter newsAdapter;
@@ -103,7 +101,7 @@ public class MainActivity extends ActionBarActivity implements LoaderManager.Loa
         if (isFirstStart) {
             runHtmlParseService();
             /* Set to false */
-            getSharedPreferences().edit().putBoolean(getResources().getString(R.string.preference_isfirststart), false);
+            getSharedPreferences().edit().putBoolean(getResources().getString(R.string.preference_isfirststart), false).apply();
         }
 
     }

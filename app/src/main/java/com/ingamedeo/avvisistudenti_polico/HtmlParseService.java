@@ -21,7 +21,6 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Created by ingamedeo on 10/10/15.
@@ -39,6 +38,8 @@ public class HtmlParseService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+
+        Constants.sampleNotification(HtmlParseService.this);
 
         dbAdapter = new DbAdapter(this); //New dpAdapter instance, used for everything except query()
 

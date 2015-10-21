@@ -2,12 +2,12 @@ package com.ingamedeo.avvisistudenti_polico;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
-public class NewsActivity extends ActionBarActivity {
+public class NewsActivity extends AppCompatActivity {
 
     private WebView newsWebView;
 

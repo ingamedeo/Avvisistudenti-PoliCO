@@ -1,5 +1,6 @@
 package com.ingamedeo.avvisistudenti_polico;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,33 +14,24 @@ import android.support.v4.app.NotificationCompat;
  */
 
 public class BootReceiver extends BroadcastReceiver {
+
+    private AlarmManager alarmMgr;
+    private PendingIntent alarmIntent;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             // Set the alarm here.
 
-            sampleNotification(context);
+            Constants.sampleNotification(context);
 
+            alarmMgr = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+            Intent serviceIntent = new Intent(context, HtmlParseService.class);
+            alarmIntent = PendingIntent.getService(context, 0, serviceIntent, 0);
+
+            alarmMgr.setInexactRepeating(AlarmManager.ELAPSED_REALTIME,
+                    AlarmManager.INTERVAL_FIFTEEN_MINUTES,
+                    AlarmManager.INTERVAL_FIFTEEN_MINUTES, alarmIntent);
         }
     }
-
-    private void sampleNotification(Context context) {
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(context)
-                        .setContentTitle("Avvisi studenti - PoliCO")
-                        .setContentText("Boot")
-                        .setStyle(new NotificationCompat.BigTextStyle()
-                                .bigText("Boot"))
-                        .setSmallIcon(R.mipmap.ic_launcher)
-                        .setDefaults(Notification.DEFAULT_LIGHTS| Notification.DEFAULT_SOUND)
-                        .setContentIntent(contentIntent)
-                        .setAutoCancel(true);
-
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.notify(10, mBuilder.build());
-    }
-
 }
