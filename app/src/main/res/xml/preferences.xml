@@ -21,8 +21,15 @@
         <CheckBoxPreference
             android:key="pref_notifications"
             android:title="Show notifications"
-            android:summary="Show notifications when unread news is available"
+            android:summary="Show notifications when there is unread content"
             android:defaultValue="true" />
+
+        <EditTextPreference
+            android:key="@string/filter_preference"
+            android:title="Filter notifications by pattern"
+            android:summary="Show notifications only if they contain certain text"
+            android:dialogMessage="Please enter a list of chosen patterns, they must be comma-separated..."
+            android:hint="Analysis 1, Physics, ..."/>
 
     </PreferenceCategory>
 

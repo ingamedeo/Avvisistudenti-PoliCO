@@ -29,6 +29,7 @@ public class HtmlParseService extends IntentService {
 
     private SharedPreferences sharedPreferences;
     private boolean isFirstStart = true;
+    private String filterStr = null; //Don't change this line plz! Still working on it.
     private Constants.Lang lang;
     private DbAdapter dbAdapter;
 
@@ -126,7 +127,7 @@ public class HtmlParseService extends IntentService {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
         isFirstStart = sharedPreferences.getBoolean(getResources().getString(R.string.preference_isfirststart), true);
-
+        filterStr = sharedPreferences.getString(getResources().getString(R.string.filter_preference), null);
         /* Android ListPreference seems to accept Strings only, i don't get why, but that's it. */
         String langIndexStr = sharedPreferences.getString(getResources().getString(R.string.preference_lang), String.valueOf(Constants.getDefaultLang(this).ordinal()));
         lang = Constants.Lang.values()[Integer.valueOf(langIndexStr)];
