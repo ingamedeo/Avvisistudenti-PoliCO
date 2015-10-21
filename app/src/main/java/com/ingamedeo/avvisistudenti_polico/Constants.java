@@ -19,7 +19,7 @@ public class Constants {
     public static final String BROADCAST_ACTION = "com.ingamedeo.avvisistudenti_polico.HtmlParseService.BROADCAST";
     public static final String EXTENDED_DATA_STATUS = "com.ingamedeo.avvisistudenti_polico.HtmlParseService.STATUS";
 
-    public static enum ServiceStatus {
+    public enum ServiceStatus {
         DONE,
         ERROR
     }

@@ -28,7 +28,6 @@ import java.util.ArrayList;
 public class HtmlParseService extends IntentService {
 
     private SharedPreferences sharedPreferences;
-    private boolean isFirstStart = true;
     private Constants.Lang lang;
     private DbAdapter dbAdapter;
 
@@ -125,7 +124,6 @@ public class HtmlParseService extends IntentService {
         if (sharedPreferences==null) {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
-        isFirstStart = sharedPreferences.getBoolean(getResources().getString(R.string.preference_isfirststart), true);
 
         /* Android ListPreference seems to accept Strings only, i don't get why, but that's it. */
         String langIndexStr = sharedPreferences.getString(getResources().getString(R.string.preference_lang), String.valueOf(Constants.getDefaultLang(this).ordinal()));

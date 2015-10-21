@@ -29,11 +29,11 @@ public class NewsAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
         ViewHolder holder = new ViewHolder();
-        View v = null;
+        View v;
 
         LayoutInflater inflater = LayoutInflater.from(context);
 
-        v = inflater.inflate(R.layout.list_item_news, null);
+        v = inflater.inflate(R.layout.list_item_news, parent, false);
         holder.newsDate = (TextView) v.findViewById(R.id.newsDate);
         holder.newsTitle = (TextView) v.findViewById(R.id.newsTitle);
 

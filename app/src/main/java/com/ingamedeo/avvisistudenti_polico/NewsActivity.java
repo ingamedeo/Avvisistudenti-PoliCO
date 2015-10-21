@@ -9,8 +9,6 @@ import android.webkit.WebView;
 
 public class NewsActivity extends AppCompatActivity {
 
-    private WebView newsWebView;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -35,14 +33,14 @@ public class NewsActivity extends AppCompatActivity {
         // Makes Progress bar Visible
         getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
 
-        newsWebView = (WebView) findViewById(R.id.newsWebView);
-        newsWebView.getSettings().setJavaScriptEnabled(true);
+        WebView newsWebView = (WebView) findViewById(R.id.newsWebView);
+        //newsWebView.getSettings().setJavaScriptEnabled(true);
         newsWebView.getSettings().setBuiltInZoomControls(true);
 
         newsWebView.setWebChromeClient(new WebChromeClient() {
             public void onProgressChanged(WebView view, int progress) {
                 //Make the bar disappear after URL is loaded, and changes string to Loading...
-                setTitle(getResources().getString(R.string.loading)+"... ("+ progress+"%)");
+                setTitle(getResources().getString(R.string.loading) + "... (" + progress + "%)");
                 setProgress(progress * 100); //Make the bar disappear after URL is loaded
 
                 // Return the app name after finish loading

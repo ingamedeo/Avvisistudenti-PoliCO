@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
@@ -36,12 +37,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private Context context = MainActivity.this;
 
     private NewsAdapter newsAdapter;
-    private ListView newsContainer;
     private Uri contentUri;
 
     private SharedPreferences sharedPreferences;
     private boolean isFirstStart = true;
-    private boolean isAutoSyncEnabled = true;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -56,7 +55,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.activity_main_swipe_refresh_layout);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary, R.color.colorPrimaryDark, R.color.colorAccent);
 
-        newsContainer = (ListView) findViewById(R.id.newsContainer);
+        ListView newsContainer = (ListView) findViewById(R.id.newsContainer);
         newsAdapter = new NewsAdapter(getApplicationContext(), null, 0);
         newsContainer.setAdapter(newsAdapter);
 
@@ -130,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                     runHtmlParseService();
                                 }
                             })
-                            .setActionTextColor(getResources().getColor(R.color.colorAccent))
+                            .setActionTextColor(ContextCompat.getColor(context, R.color.colorAccent))
                             .show();
                     break;
             }
@@ -182,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void loadfromPref() {
         isFirstStart = getSharedPreferences().getBoolean(getResources().getString(R.string.preference_isfirststart), true);
-        isAutoSyncEnabled = getSharedPreferences().getBoolean(getResources().getString(R.string.preference_sync), true);
+        boolean isAutoSyncEnabled = getSharedPreferences().getBoolean(getResources().getString(R.string.preference_sync), true);
         toggleBootReceiver(isAutoSyncEnabled);
     }
 
