@@ -24,6 +24,8 @@ public class ContentProviderDb extends ContentProvider {
     public int delete(Uri uri, String where, String[] args) {
         String table = getTableName(uri);
         int del = db.delete(table, where, args);
+        /* Fix potential SQL OverFlow - unexpected behavior */
+        db.execSQL("DELETE FROM SQLITE_SEQUENCE WHERE NAME = '" + NewsTable.TABLE_NAME + "'");
         getContext().getContentResolver().notifyChange(uri, null); //Notify what happened here ;)
         return del;
     }

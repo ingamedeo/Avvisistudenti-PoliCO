@@ -98,6 +98,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         /* First Startup Handling */
         if (isFirstStart) {
+            swipeRefreshLayout.setRefreshing(true); //Set refreshing
+
             runHtmlParseService();
             /* Set to false */
             getSharedPreferences().edit().putBoolean(getResources().getString(R.string.preference_isfirststart), false).apply();
@@ -125,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             .setAction(getResources().getString(R.string.retry), new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    swipeRefreshLayout.setRefreshing(true);
+                                    swipeRefreshLayout.setRefreshing(true); //Set refreshing
                                     runHtmlParseService();
                                 }
                             })
@@ -183,6 +185,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         isFirstStart = getSharedPreferences().getBoolean(getResources().getString(R.string.preference_isfirststart), true);
         boolean isAutoSyncEnabled = getSharedPreferences().getBoolean(getResources().getString(R.string.preference_sync), true);
         toggleBootReceiver(isAutoSyncEnabled);
+
+        String filterString = getSharedPreferences().getString(getResources().getString(R.string.filter_preference), null);
+        //Constants.getFilterPatterns(filterString); //WTF?!
     }
 
     private void toggleBootReceiver(boolean enable) {
@@ -223,13 +228,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode==SETTINGS_RESULT) {
+
             swipeRefreshLayout.setRefreshing(true); //Set refreshing
+
+            //Set sync period. (Apart from pref sync cos I don't want to set it when the app is first opened. (BootReceiver does it)
+            Constants.setSyncPeriod(context, sharedPreferences);
 
             /* Load new pref */
             loadfromPref();
 
+            /* NOTE: Removed. The alarm set by setSyncPeriod is already calling the service causing the screen to flash. */
             /* Call service to refresh */
-            runHtmlParseService();
+            //runHtmlParseService();
         }
 
         super.onActivityResult(requestCode, resultCode, data);

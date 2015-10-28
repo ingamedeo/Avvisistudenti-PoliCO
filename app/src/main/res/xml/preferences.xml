@@ -2,34 +2,43 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
-        android:title="General"
+        android:title="@string/general"
         android:key="pref_key_storage_settings">
 
         <ListPreference
-            android:key="language_preference"
-            android:title="Language"
+            android:key="@string/preference_lang"
+            android:title="@string/language"
             android:entries="@array/languages"
             android:entryValues="@array/language_codes"
             android:summary="%s"/>
 
         <CheckBoxPreference
             android:key="@string/preference_sync"
-            android:title="Auto-Sync"
-            android:summary="Sync news automatically"
+            android:title="@string/autosync"
+            android:summary="@string/autosync_summary"
             android:defaultValue="true" />
 
+        <ListPreference
+            android:key="@string/preference_syncinterval"
+            android:title="@string/sync_average"
+            android:entries="@array/intervals"
+            android:entryValues="@array/interval_codes"
+            android:summary="%s"
+            android:dependency="@string/preference_sync"/>
+
         <CheckBoxPreference
-            android:key="pref_notifications"
-            android:title="Show notifications"
-            android:summary="Show notifications when there is unread content"
+            android:key="@string/preference_notifications"
+            android:title="@string/shownotifications"
+            android:summary="@string/shownotifications_summary"
             android:defaultValue="true" />
 
         <EditTextPreference
             android:key="@string/filter_preference"
-            android:title="Filter notifications by pattern"
-            android:summary="Show notifications only if they contain certain text"
-            android:dialogMessage="Please enter a list of chosen patterns, they must be comma-separated..."
-            android:hint="Analysis 1, Physics, ..."/>
+            android:title="@string/filternotifications"
+            android:summary="@string/filternotifications_summary"
+            android:dialogMessage="@string/filternotifications_dialog"
+            android:hint="@string/filternotifications_hint"
+            android:dependency="@string/preference_notifications"/>
 
     </PreferenceCategory>
 

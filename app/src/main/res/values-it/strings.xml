@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_settings">Impostazioni</string>
+    <string name="loading">Caricamento</string>
+    <string name="failed_update_news">Aggiornamento news fallito</string>
+    <string name="retry">Riprova</string>
+    <string name="multiple_unread_notif">"News non lette!"</string>
+    <string name="general">Generale</string>
+    <string name="language">Lingua news</string>
+    <string name="autosync">Auto-Sync</string>
+    <string name="autosync_summary">Sincronizza le news automaticamente</string>
+    <string name="sync_average">Sincronizza in media ogni</string>
+    <string name="shownotifications">Mostra notifiche</string>
+    <string name="shownotifications_summary">Mostra notifiche quando è presente contenuto non letto</string>
+    <string name="filternotifications">Filtra le notifiche in base alle parole "chiave"</string>
+    <string name="filternotifications_summary">Mostra le notifiche solo se contengono un testo specifico</string>
+    <string name="filternotifications_dialog">Inserisci una lista di parole "chiave" divise da una virgola</string>
+    <string name="filternotifications_hint">Analisi 1, Fisica, …</string>
+
+</resources>
+
+<!--
+
+                2 unread news found!
+                3 unread news found!
+
+-->

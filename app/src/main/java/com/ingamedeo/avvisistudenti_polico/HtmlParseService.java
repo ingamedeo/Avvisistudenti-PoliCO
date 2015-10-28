@@ -31,6 +31,7 @@ public class HtmlParseService extends IntentService {
     private Constants.Lang lang;
     private DbAdapter dbAdapter;
     private String filterStr = null; //Don't change this line...I'm still working on it
+    private boolean notificationsEnabled = true;
 
     public HtmlParseService() {
         super(HtmlParseService.class.getSimpleName());
@@ -38,9 +39,6 @@ public class HtmlParseService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-
-        /* Demo notification - helps ensure the service is launched */
-        Constants.sampleNotification(HtmlParseService.this);
 
         dbAdapter = new DbAdapter(this); //New dpAdapter instance, used for everything except query()
 
@@ -54,13 +52,13 @@ public class HtmlParseService extends IntentService {
 
                 String[] newTitles = scanNews(newsItems);
 
-                if (newTitles!=null && newTitles.length>0) {
+                if (newTitles!=null && newTitles.length>0 && notificationsEnabled) {
 
                     String contentText;
                     if (newTitles.length==1) {
                         contentText = newTitles[0];
                     } else {
-                        contentText = "There is " + newTitles.length + " unread news!";
+                        contentText = newTitles.length + " " + getString(R.string.multiple_unread_notif);
                     }
 
                     Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -68,7 +66,7 @@ public class HtmlParseService extends IntentService {
 
                     NotificationCompat.Builder mBuilder =
                             new NotificationCompat.Builder(this)
-                                    .setContentTitle("Avvisi studenti - PoliCO")
+                                    .setContentTitle(getResources().getString(R.string.app_name))
                                     .setContentText(contentText)
                                     .setStyle(new NotificationCompat.BigTextStyle()
                                             .bigText(contentText))
@@ -126,7 +124,7 @@ public class HtmlParseService extends IntentService {
         if (sharedPreferences==null) {
             sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         }
-
+        notificationsEnabled = sharedPreferences.getBoolean(getResources().getString(R.string.preference_notifications), true);
         filterStr = sharedPreferences.getString(getResources().getString(R.string.filter_preference), null);
         /* Android ListPreference seems to accept Strings only, i don't get why, but that's it. */
         String langIndexStr = sharedPreferences.getString(getResources().getString(R.string.preference_lang), String.valueOf(Constants.getDefaultLang(this).ordinal()));
@@ -155,7 +153,7 @@ public class HtmlParseService extends IntentService {
             if (date.size()==1 && link.size()==1) {
 
                 /* Check link.text() contains filter keywords ... + Db Check */
-                if (((filterStr!=null && filterStr.contains(text)) || filterStr==null) && !dbAdapter.checkNewsExists(date.text(), text, "http://www.polo-como.polimi.it/"+link.attr("href"))) {
+                if (((filterStr!=null && filterStr.toLowerCase().contains(text.toLowerCase())) || filterStr==null) && !dbAdapter.checkNewsExists(date.text(), text, "http://www.polo-como.polimi.it/"+link.attr("href"))) {
                     newTitles.add(link.text());
                 }
 

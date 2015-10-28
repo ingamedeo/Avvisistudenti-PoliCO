@@ -34,7 +34,11 @@ public class NewsActivity extends AppCompatActivity {
         getWindow().setFeatureInt(Window.FEATURE_PROGRESS, Window.PROGRESS_VISIBILITY_ON);
 
         WebView newsWebView = (WebView) findViewById(R.id.newsWebView);
-        //newsWebView.getSettings().setJavaScriptEnabled(true);
+
+        //Load in Overview mode and override ViewPort
+        newsWebView.getSettings().setUseWideViewPort(true);
+        newsWebView.getSettings().setLoadWithOverviewMode(true);
+
         newsWebView.getSettings().setBuiltInZoomControls(true);
 
         newsWebView.setWebChromeClient(new WebChromeClient() {

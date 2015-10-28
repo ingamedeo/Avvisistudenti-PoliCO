@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/newsDate"
-        android:text="11/10/2015"
+
         android:gravity="center"
         android:background="@color/colorAccent"
         android:textColor="@android:color/white"/>
@@ -19,9 +19,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/newsTitle"
-        android:text="AVVISO IMPORTANTE - Chiusura Segreteria / StuDesk / Welcome Desk - martedì 13/10/2015"
         android:padding="5dp"
         android:gravity="center"
         android:textColor="@color/newsText"/>
 
 </LinearLayout>
+
+<!--
+android:text="GG/MM/YYYY"
+android:text="Example news. There's something new. Day GG/DD/YYYY."
+-->

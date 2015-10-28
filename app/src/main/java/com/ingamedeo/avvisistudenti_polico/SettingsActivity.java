@@ -16,10 +16,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
 
-        ListPreference langPref = (ListPreference) findPreference("language_preference");
+        ListPreference langPref = (ListPreference) findPreference(getResources().getString(R.string.preference_lang));
         if (langPref.getValue()==null) {
             langPref.setValueIndex(Constants.getDefaultLang(this).ordinal());
         }
+
+        ListPreference syncIntervalPref = (ListPreference) findPreference(getResources().getString(R.string.preference_syncinterval));
+        if (syncIntervalPref.getValue()==null) {
+            syncIntervalPref.setValueIndex(Constants.defaultInterval.ordinal());
+        }
+
     }
 
     @Override
